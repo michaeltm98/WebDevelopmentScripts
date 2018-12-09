@@ -1,0 +1,16 @@
+.winner {
+    color: green;
+}
+
+.center {
+    text-align: center;
+}
+
+.margininline {
+    display: inline-block; /* the default for span */
+    margin: 25px;
+  }
+
+  .margin {
+      margin: 25px;
+  }
