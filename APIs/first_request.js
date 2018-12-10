@@ -17,3 +17,5 @@ request("https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20weather
 //&apikey=thewdb
 
 //This is the conflict on the master branch
+//This is the conflict on the sidebranch
+
