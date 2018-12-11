@@ -11,7 +11,8 @@ app.set('view engine', 'ejs');
 //SCHEMA SETTUP
 var campgroundSchema = new mongoose.Schema({
     name: String,
-    image: String
+    image: String,
+    description: String
 });
 
 var Campground = mongoose.model("Campground", campgroundSchema);
@@ -21,7 +22,8 @@ var Campground = mongoose.model("Campground", campgroundSchema);
 function createCampground() {
     Campground.create({
         name: "Pacific Rim National Park Reserve",
-        image: "https://s-i.huffpost.com/gadgets/slideshows/484816/slide_484816_6656172_compressed.jpg"},
+        image: "https://s-i.huffpost.com/gadgets/slideshows/484816/slide_484816_6656172_compressed.jpg",
+        description: "Beautiful campgrounds"},
         function(err, campground) {
             if (err) {
                 console.log(err);
@@ -31,6 +33,7 @@ function createCampground() {
             }
         });
 }
+
 
 function getCampgrounds(){
     Campground.find({}, function(err, campgrounds) {
@@ -69,6 +72,7 @@ app.get('/', function(req, res) {
    res.render("landing")
 });
 
+//INDEX
 app.get('/campgrounds', function(req, res) {
     Campground.find({}, function(err, campgrounds) {
         if (err) {
@@ -76,16 +80,18 @@ app.get('/campgrounds', function(req, res) {
         }
         else {
             console.log("Campgrounds fetched");
-            res.render('campgrounds', {campgrounds: campgrounds});
+            res.render('index', {campgrounds: campgrounds});
         }
     });
     
 });
 
+//CREATE
 app.post('/campgrounds', function(req, res) {
     var name = req.body.name;
     var image = req.body.image;
-    var newCampground = {name: name, image: image}
+    var description = req.body.description;
+    var newCampground = {name: name, image: image, description: description}
     
     Campground.create(newCampground, function(err, campground) {
         if (err) {
@@ -97,8 +103,22 @@ app.post('/campgrounds', function(req, res) {
     })
 });
 
+//NEW
 app.get('/campgrounds/new', function(req, res) {
     res.render('new');
+});
+
+//SHOW
+app.get('/campgrounds/:id', function(req, res) {
+    var id = req.params.id;
+    Campground.findById(id, function(err, campground) {
+        if (err) {
+            console.log(err);
+        } else {
+            res.render("show", {campground, campground});
+        }
+    });
+    
 });
 
 app.listen(3000, function() {
