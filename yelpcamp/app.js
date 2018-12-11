@@ -1,9 +1,53 @@
 var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
+const mongoose = require('mongoose');
 
+mongoose.connect('mongodb://localhost:27017/yelp_camp', {useNewUrlParser: true});
 app.use(bodyParser.urlencoded({extended: true}));
 app.set('view engine', 'ejs');
+
+
+//SCHEMA SETTUP
+var campgroundSchema = new mongoose.Schema({
+    name: String,
+    image: String
+});
+
+var Campground = mongoose.model("Campground", campgroundSchema);
+
+
+
+function createCampground() {
+    Campground.create({
+        name: "Pacific Rim National Park Reserve",
+        image: "https://s-i.huffpost.com/gadgets/slideshows/484816/slide_484816_6656172_compressed.jpg"},
+        function(err, campground) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.log("campground", campground);
+            }
+        });
+}
+
+function getCampgrounds(){
+    Campground.find({}, function(err, campgrounds) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("Campgrounds fetched", campgrounds);
+            return campgrounds;
+        }
+    });
+}
+
+
+
+
+
 
 var campgrounds = [
     {name: "Mount Assiniboine Provincial Park", image: "https://s-i.huffpost.com/gadgets/slideshows/484816/slide_484816_6655992_compressed.jpg"},
@@ -26,16 +70,31 @@ app.get('/', function(req, res) {
 });
 
 app.get('/campgrounds', function(req, res) {
-    res.render('campgrounds', {campgrounds: campgrounds});
+    Campground.find({}, function(err, campgrounds) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            console.log("Campgrounds fetched");
+            res.render('campgrounds', {campgrounds: campgrounds});
+        }
+    });
+    
 });
 
 app.post('/campgrounds', function(req, res) {
     var name = req.body.name;
     var image = req.body.image;
     var newCampground = {name: name, image: image}
-    campgrounds.push(newCampground);
-
-    res.redirect("/campgrounds");
+    
+    Campground.create(newCampground, function(err, campground) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("Campground created")
+            res.redirect("/campgrounds");
+        }
+    })
 });
 
 app.get('/campgrounds/new', function(req, res) {
@@ -43,7 +102,7 @@ app.get('/campgrounds/new', function(req, res) {
 });
 
 app.listen(3000, function() {
-    console.log("YelpCamp server is listening on port 3000.../n" + surprisedPikachu);
+    console.log("YelpCamp server is listening on port 3000..." );
 });
 
 
