@@ -6,7 +6,15 @@ const methodOverride = require("method-override");
 const expressSanitizer = require("express-sanitizer");
 
 // APP config
-mongoose.connect("mongodb://localhost:27017/restful_blog_app", {useNewUrlParser: true}, function(err) {
+// mongoose.connect("mongodb://localhost:27017/restful_blog_app", {useNewUrlParser: true}, function(err) {
+//     if(err) {
+//         console.log(err);
+//     } else {
+//         console.log("Successfully connected to database...");
+//     }
+// });
+
+mongoose.connect("mongodb://ian:secretPassword@107.23.245.181:27017/cool_db", {useNewUrlParser: true}, function(err) {
     if(err) {
         console.log(err);
     } else {
@@ -56,14 +64,14 @@ app.get("/blogs/new", function(req, res) {
 
 app.post('/blogs', function(req, res) {
 
-    console.log(req.body);
     req.body.blog.body = req.sanitize(req.body.blog.body);
-    console.log(req.body);
     Blog.create(req.body.blog, function(err, newBlog) {
         if(err) {
             res.render("new");
+            console.log(`Error creating blog ${err}`);
         }
         else {
+            console.log(`Created blog ${blog}`);
             res.redirect('/blogs')
         }
     });
@@ -95,7 +103,9 @@ app.put('/blogs/:id', function(req, res) {
     Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, blog) {
         if(err) {
             res.redirect("/blogs");
+            console.log(`Error updating blog ${err}`);
         } else {
+            console.log(`Updated blog ${blog}`);
             res.redirect("/blogs/" + req.params.id);
         }
     });
