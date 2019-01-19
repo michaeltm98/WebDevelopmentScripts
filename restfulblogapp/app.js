@@ -14,13 +14,14 @@ const expressSanitizer = require("express-sanitizer");
 //     }
 // });
 
-mongoose.connect("mongodb://ian:secretPassword@107.23.245.181:27017/cool_db", {useNewUrlParser: true}, function(err) {
-    if(err) {
-        console.log(err);
-    } else {
-        console.log("Successfully connected to database...");
-    }
-});
+// mongoose.connect("mongodb://ian:secretPassword@107.23.245.181:27017/cool_db", {useNewUrlParser: true}, function(err) {
+//     if(err) {
+//         console.log(err);
+//     } else {
+//         console.log("Successfully connected to database...");
+//     }
+// });
+mongoose.connect('mongodb://localhost:27017/placestogo', {useNewUrlParser: true});
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
