@@ -39,12 +39,13 @@ passport.deserializeUser(User.deserializeUser());
 app.use(bodyParser.urlencoded({extended: true}));
 
 app.use(function(req, res, next) {
-    res.locals.currentUser = req.User;
+    console.log(req.user);
+    res.locals.currentUser = req.user;
     next();
 })
 
 
-seedDB();
+// seedDB();
 
 
 app.use(indexRoutes);
