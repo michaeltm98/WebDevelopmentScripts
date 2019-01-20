@@ -15,7 +15,7 @@ router.get('/campgrounds/:id/comments/new', isLoggedIn, function(req, res) {
 });
 
 router.post('/campgrounds/:id/comments/new', isLoggedIn, function(req, res) {
-    Campground.findById(req.params.id, function(err, campground) {
+    Campground.findById(req.params.id, function (err, campground) {
         if(err) {
             res.redirect('/campgrounds');
         } else {
@@ -33,3 +33,12 @@ router.post('/campgrounds/:id/comments/new', isLoggedIn, function(req, res) {
 });
 
 
+ 
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next();
+    } 
+    res.redirect("/login");
+};
+
+module.exports = router;
