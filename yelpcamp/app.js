@@ -10,10 +10,6 @@ var LocalStrategy = require('passport-local');
 User = require('./models/user')
 
 mongoose.connect('mongodb://localhost:27017/yelp_camp', {useNewUrlParser: true});
-app.use(bodyParser.urlencoded({extended: true}));
-app.use(express.static(__dirname + "/public"));
-app.set('view engine', 'ejs');
-seedDB();
 
 //PASSPORT CONFIG
 app.use(require('express-session')({
@@ -22,15 +18,23 @@ app.use(require('express-session')({
     saveUninitialized: false
 }));
 
+app.set('view engine', 'ejs');
+
+app.use(express.static(__dirname + "/public"));
+
+
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+app.use(bodyParser.urlencoded({extended: true}));
 
 
 
+seedDB();
 
 
 app.get('/', function(req, res) {
@@ -90,7 +94,7 @@ app.get('/campgrounds/:id', function(req, res) {
 //=========================================
 //comment routes
 //====================================
-app.get('/campgrounds/:id/comments/new', function(req, res) {
+app.get('/campgrounds/:id/comments/new', isLoggedIn, function(req, res) {
     Campground.findById(req.params.id, function(err, campground) {
         if(err) {
             console.log(err);
@@ -100,7 +104,7 @@ app.get('/campgrounds/:id/comments/new', function(req, res) {
     });
 });
 
-app.post('/campgrounds/:id/comments/new', function(req, res) {
+app.post('/campgrounds/:id/comments/new', isLoggedIn, function(req, res) {
     Campground.findById(req.params.id, function(err, campground) {
         if(err) {
             res.redirect('/campgrounds');
@@ -136,6 +140,32 @@ app.post('/register', function(req, res) {
         }
     })
 })
+
+app.get('/login', function(req, res) {
+    res.render("login");
+});
+
+app.post('/login', passport.authenticate("local", 
+    {
+        successRedirect: '/campgrounds',
+        failureRedirect: '/login'
+    }), 
+    function(req, res) {
+});
+
+app.get('/logout', function(req, res) {
+    req.logout();
+    res.redirect('/campgrounds');
+});
+
+function isLoggedIn(req, res, next) {
+    if(req.isAuthenticated()) {
+        return next();
+    } 
+    res.redirect("/login");
+}
+
+
 
 app.listen(3000, function() {
     console.log("YelpCamp server is listening on port 3000..." );
