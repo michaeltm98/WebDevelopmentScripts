@@ -2,9 +2,10 @@ var express = require('express');
 var router = express.Router({mergeParams: true});
 var Campground = require("../models/campground");
 var Comment = require("../models/comment");
+var middleware = require('../middleware');
 
 
-router.get('/new', isLoggedIn, function(req, res) {
+router.get('/new', middleware.isLoggedIn, function(req, res) {
     Campground.findById(req.params.id, function(err, campground) {
         if(err) {
             console.log(err);
@@ -14,7 +15,7 @@ router.get('/new', isLoggedIn, function(req, res) {
     });
 });
 
-router.post('/new', isLoggedIn, function(req, res) {
+router.post('/new', middleware.isLoggedIn, function(req, res) {
     Campground.findById(req.params.id, function (err, campground) {
         if(err) {
             res.redirect('/campgrounds');
@@ -38,7 +39,7 @@ router.post('/new', isLoggedIn, function(req, res) {
     });
 });
 
-router.get('/:comment_id/edit', function(req, res) {
+router.get('/:comment_id/edit', middleware.checkCommentOwnership, function(req, res) {
     Comment.findById(req.params.comment_id, function(err, comment) {
         if(err) {
             res.redirect("back");
@@ -48,7 +49,7 @@ router.get('/:comment_id/edit', function(req, res) {
     }); 
 });
 
-router.put('/:comment_id', function(req, res) {
+router.put('/:comment_id', middleware.checkCommentOwnership, function(req, res) {
     Comment.findByIdAndUpdate(req.params.comment_id, req.body.comment, function(err, comment) {
         if(err) {
             res.redirect("back");
@@ -59,7 +60,7 @@ router.put('/:comment_id', function(req, res) {
 });
 
 // COMMENTS DESTROY ROUTE
-router.delete("/:comment_id", function(req, res) {
+router.delete("/:comment_id", middleware.checkCommentOwnership, function(req, res) {
     Comment.findByIdAndRemove(req.params.comment_id, function(err) {
         if(err) {
             res.redirect("back");
@@ -69,13 +70,5 @@ router.delete("/:comment_id", function(req, res) {
     })
 });
 
-
- 
-function isLoggedIn(req, res, next) {
-    if(req.isAuthenticated()) {
-        return next();
-    } 
-    res.redirect("/login");
-};
 
 module.exports = router;
