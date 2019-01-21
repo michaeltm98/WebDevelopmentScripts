@@ -43,11 +43,13 @@ router.get('/new', middleware.isLoggedIn, function(req, res) {
 });
 
 //SHOW
-router.get('/:id', middleware.isLoggedIn, function(req, res) {
+router.get('/:id', function(req, res) {
     var id = req.params.id;
     Campground.findById(req.params.id).populate("comments").exec(function(err, campground) {
-        if (err) {
+        if (err || !campground) {
             console.log(err);
+            req.flash('error', 'Sorry, that campground does not exist!');
+            res.redirect('/campgrounds');
         } else {
             res.render("campgrounds/show", {campground, campground});
         }
@@ -56,6 +58,9 @@ router.get('/:id', middleware.isLoggedIn, function(req, res) {
 
 router.get('/:id/edit', middleware.checkCampgroundOwnership, function(req, res) {
     Campground.findById(req.params.id, function(err, campground) {
+        if(err) {
+            req.flash("error", "Cannot get campground")
+        }
         res.render("campgrounds/edit", {campground, campground});
     });
 });
